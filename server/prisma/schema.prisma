@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  username String?
+  name     String?
+  password String
+  role     Role     @default(USER)
+  Profile  Profile?
+  todos    Todo[]
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Todo {
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(100)
+  description String     @db.VarChar(700)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  status      TodoStatus @default(PENDING)
+  prioritized Boolean    @default(false)
+  dueDate     DateTime
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+}
+
+enum TodoStatus {
+  PENDING
+  COMPLETED
+  IN_PROGRESS
+}
