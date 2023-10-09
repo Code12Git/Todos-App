@@ -20,6 +20,8 @@ export interface TodoType {
     updatedAt?: string;
     createdAt?: string;
     dueDate?: string;
+    status?: string;
+    prioritized?: boolean;
 }
 
 export interface TodoError {

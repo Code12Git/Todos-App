@@ -3,11 +3,13 @@ import {
 	createTodo,
 	deleteTodo,
 	getAllTodo,
-	getTodo,
-	proritizedTodo,
 	searchTodo,
 	sortTodo,
 	updateTodo,
+	statusChangeController,
+	prioritizedTodo,
+	updatePriority,
+	Pagination,
 } from "../controllers/todoController.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -23,7 +25,7 @@ router.put("/:id", verifyToken, updateTodo);
 router.delete("/:id", verifyToken, deleteTodo);
 
 //Get Todo
-router.get("/:id", verifyToken, getTodo);
+// router.get("/:id", verifyToken, getTodo);
 
 //Get All Todo
 router.get("/", verifyToken, getAllTodo);
@@ -34,7 +36,16 @@ router.get("/search", verifyToken, searchTodo);
 //Sort Todo
 router.get("/sort", verifyToken, sortTodo);
 
+//Status Change
+router.put("/status/:id", verifyToken, statusChangeController);
+
 //Prioritized Todo
-router.get("/priority", verifyToken, proritizedTodo);
+router.get("/priority", verifyToken, prioritizedTodo);
+
+//Changing Priority
+router.put("/priority/:id", verifyToken, updatePriority);
+
+//Pagination
+router.get("/pagination", verifyToken, Pagination);
 
 export default router;
