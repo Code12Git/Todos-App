@@ -10,8 +10,7 @@ export const createTodo = async (req, res) => {
 		const validator = vine.compile(todoSchema);
 		const payload = await validator.validate(req.body);
 		const userId = req.user.id;
-		console.log("Request Payload:", req.body);
-		console.log(req.user.id);
+
 		const dueDate = req.body.dueDate ? new Date(req.body.dueDate) : new Date();
 
 		const todo = await prisma.todo.create({
@@ -132,12 +131,12 @@ export const searchTodo = async (req, res) => {
 				OR: [
 					{
 						title: {
-							startsWith: query,
+							startsWith: query.title,
 						},
 					},
 					{
 						description: {
-							startsWith: query,
+							startsWith: query.description,
 						},
 					},
 				],
@@ -165,43 +164,100 @@ export const searchTodo = async (req, res) => {
 //Sorting Todo
 export const sortTodo = async (req, res) => {
 	try {
-		const sortTodo = await prisma.todo.find({
+		const sortOrder = req.query.prioritized === "true" ? "asc" : "desc";
+
+		const sortedTodo = await prisma.todo.findMany({
 			orderBy: {
-				title: req.query.sort,
+				prioritized: sortOrder,
 			},
 		});
+
 		return res.status(200).json({
 			success: true,
 			message: "Todo fetched successfully",
-			sortTodo,
+			sortedTodo,
 		});
 	} catch (err) {
 		res.status(500).json({ errors: err.messages });
 	}
 };
 
-// export const paginationTodo=async(req,res)=>{
-// 	try{
-// 		const todo=await prisma.todo.
-// 	}catch(err){
-
-// 	}
-// }
-
 //Proritized Todo
-export const proritizedTodo = async (req, res) => {
+export const prioritizedTodo = async (req, res) => {
 	try {
-		const todo = await prisma.todo.findMany({
+		const todos = await prisma.todo.findMany({
 			where: {
-				priority: req.query.priority,
+				prioritized: req.body.prioritized,
+			},
+		});
+
+		res.status(200).json({
+			success: true,
+			message: "Todos fetched successfully",
+			todos,
+		});
+	} catch (err) {
+		res.status(500).json({ errors: err.messages });
+	}
+};
+
+//Updating Priority
+export const updatePriority = async (req, res) => {
+	try {
+		const todo = await prisma.todo.update({
+			where: {
+				id: parseInt(req.params.id, 10),
+			},
+			data: {
+				prioritized: req.body.prioritized,
 			},
 		});
 		return res.status(200).json({
 			success: true,
-			message: "Todo fetched successfully",
+			message: "Priority updated successfully",
 			todo,
 		});
 	} catch (err) {
 		res.status(500).json({ errors: err.messages });
+	}
+};
+
+//Changing Status
+
+export const statusChangeController = async (req, res) => {
+	console.log(req.body);
+	try {
+		const todo = await prisma.todo.update({
+			where: {
+				id: parseInt(req.params.id, 10),
+			},
+			data: {
+				status: req.body.status,
+			},
+		});
+		return res.status(200).json({
+			success: true,
+			message: "Status changed successfully",
+			todo,
+		});
+	} catch (err) {
+		res.status(500).json({ errors: err.messages });
+	}
+};
+
+//Pagination
+export const Pagination = async (req, res) => {
+	try {
+		const pgnum = +(req.query.pgnum ?? 0);
+		const pgsize = +(req.query.pgsize ?? 10);
+		console.log(pgnum, pgsize);
+		const todos = await prisma.todo.findMany({
+			skip: pgnum * pgsize,
+			take: pgsize,
+		});
+
+		res.status(200).json(todos);
+	} catch (err) {
+		res.status(500).json(err);
 	}
 };

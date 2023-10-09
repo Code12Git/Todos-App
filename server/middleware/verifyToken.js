@@ -27,6 +27,7 @@ export const verifyToken = async (req, res, next) => {
 			}
 
 			req.user = user;
+
 			next();
 		} catch (err) {
 			return res.status(403).json("Token is not valid!");

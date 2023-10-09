@@ -4,6 +4,6 @@
 
 
 body {
-  background-image: linear-gradient(to right, rgb(249, 168, 212), rgb(216, 180, 254), rgb(129, 140, 248))
-
+    background: linear-gradient(135deg, #ff6b6b, #c554e3);
+    /* Replace these color codes (#ff6b6b and #c554e3) with your desired pink and violet colors */
 }

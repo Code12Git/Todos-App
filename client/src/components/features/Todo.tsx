@@ -1,11 +1,11 @@
 "use client";
 import { TodoError, TodoType } from "@/types/types";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { privateRequest } from "@/utils/axios";
 import toast, { Toaster } from "react-hot-toast";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
-
+import { useToken } from "@/hooks/Token";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,6 +15,9 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 const Todo = () => {
+	const token = useToken();
+
+	console.log(token);
 	const [todos, setTodos] = useState<TodoType>({
 		title: "",
 		description: "",
@@ -33,10 +36,33 @@ const Todo = () => {
 		event.preventDefault();
 
 		try {
-			const response = await privateRequest.post("/todo", {
-				...todos,
-				dueDate: date,
-			});
+			if (!token) {
+				const response = await privateRequest.post(
+					"/todo",
+					{
+						...todos,
+						dueDate: date,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+				return;
+			}
+			const response = await privateRequest.post(
+				"/todo",
+				{
+					...todos,
+					dueDate: date,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
 
 			// Check if the response indicates success
 			if (response.status === 200 && response.data.success) {
@@ -90,7 +116,7 @@ const Todo = () => {
 						<p className="text-red-600">{errors.description}</p>
 					)}
 				</div>
-
+				<label className="text-xl">Due Date</label>
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -104,7 +130,7 @@ const Todo = () => {
 							{date ? format(date, "PPP") : <span>Pick a due date</span>}
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-auto p-0" align="start">
+					<PopoverContent className="w-auto p-0 bg-white" align="start">
 						<Calendar
 							mode="single"
 							selected={date}
