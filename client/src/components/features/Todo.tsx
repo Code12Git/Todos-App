@@ -14,10 +14,14 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-const Todo = () => {
+
+interface TodoProps {
+	getData: () => void;
+}
+
+const Todo: React.FC<TodoProps> = ({ getData }) => {
 	const token = useToken();
 
-	console.log(token);
 	const [todos, setTodos] = useState<TodoType>({
 		title: "",
 		description: "",
@@ -64,9 +68,9 @@ const Todo = () => {
 				}
 			);
 
-			// Check if the response indicates success
 			if (response.status === 200 && response.data.success) {
 				toast.success("Todo successfully added");
+				getData();
 			} else {
 				toast.error("An error occurred");
 			}
@@ -83,7 +87,6 @@ const Todo = () => {
 
 	return (
 		<div className="flex flex-col justify-center items-center mt-24">
-			<Toaster />
 			<h1 className="text-3xl bg-gradient-to-r from-purple-500 via-pink-500 to-red-400 bg-clip-text text-transparent font-bold">
 				Task Master
 			</h1>

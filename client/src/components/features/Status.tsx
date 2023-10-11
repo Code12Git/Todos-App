@@ -43,11 +43,9 @@ const Status: React.FC<Props> = ({ data, getData }) => {
 				}
 			);
 
-			console.log(res, "Todo successfully updated");
 			getData();
 			toast.success("Status changed successfully!");
 		} catch (err: any) {
-			console.error(err);
 			toast.error("Failed to change status.");
 		}
 	};
@@ -89,7 +87,7 @@ const Status: React.FC<Props> = ({ data, getData }) => {
 							</select>
 							<Button
 								onClick={handleChangeHandler}
-								className="w-44  rounded  bg-black text-white"
+								className="w-44  rounded  bg-black hover:bg-black hover:text-white text-white"
 							>
 								Change Status
 							</Button>

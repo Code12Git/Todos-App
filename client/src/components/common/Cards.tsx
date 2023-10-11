@@ -7,7 +7,7 @@ import { TodoType } from "@/types/types";
 import { format } from "timeago.js";
 import { motion } from "framer-motion";
 import { useToken } from "@/hooks/Token";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -18,6 +18,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import Todo from "../features/Todo";
 
 const containerVariants = {
 	hidden: { opacity: 1, scale: 0 },
@@ -41,7 +42,7 @@ const itemVariants = {
 
 const Cards = () => {
 	const token = useToken();
-	console.log(token);
+
 	const [data, setData] = useState<TodoType[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [pgnum, setPgnum] = useState(0);
@@ -85,8 +86,8 @@ const Cards = () => {
 
 			setData(res.data);
 			setLoading(false);
-		} catch (error) {
-			console.error("Error fetching data: ", error);
+		} catch (error: any) {
+			toast.error("Error fetching data: ", error);
 		}
 	};
 
@@ -117,6 +118,8 @@ const Cards = () => {
 
 	return (
 		<>
+			<Toaster />
+			<Todo getData={getData} />
 			<div className="flex justify-around items-center">
 				{/* Searching */}
 				<div className="flex items-center justify-center h-full mt-10">

@@ -8,7 +8,6 @@ import Status from "../features/Status";
 import UpdateDialog from "./UpdateDialog";
 import { useToken } from "@/hooks/Token";
 import Prioritized from "../features/Prioritized";
-import Pagination from "../features/Pagination";
 
 interface CardProps {
 	data: TodoType;
@@ -34,20 +33,19 @@ const Card: React.FC<CardProps> = ({ data, formatDueDate, getData }) => {
 					toast.success("Todo deleted successfully!");
 				} else {
 					// Handle any other response status (e.g., error handling)
-					console.error("Delete request failed with status:", res.status);
+					toast.error("Delete request failed");
 				}
 			} else {
 				// Handle the case where the token is not available (e.g., user not authenticated)
-				console.error("Token is not available. User not authenticated.");
+				toast.error("Token is not available. User not authenticated.");
 			}
-		} catch (err) {
-			console.error("Error while deleting todo:", err);
+		} catch (err: any) {
+			toast.error("Error while deleting todo:", err);
 		}
 	};
 
 	return (
 		<div className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-400  transition-transform hover:scale-105 cursor-pointer ease-in-out delay-300 duration-200 rounded shadow-lg overflow-hidden w-full mb-4">
-			<Toaster />
 			<div className="p-4">
 				<div className="flex justify-between items-center mb-3">
 					<h2 className="text-lg font-semibold text-white">{data.title}</h2>

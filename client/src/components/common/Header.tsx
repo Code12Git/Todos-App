@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 
 const Header = () => {
 	const router = useRouter();
+
 	const handleLogout = () => {
 		localStorage.removeItem("user");
 		localStorage.removeItem("token");

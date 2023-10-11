@@ -192,7 +192,6 @@ export const updatePriority = async (req, res) => {
 //Changing Status
 
 export const statusChangeController = async (req, res) => {
-	console.log(req.body);
 	try {
 		const todo = await prisma.todo.update({
 			where: {
@@ -215,6 +214,8 @@ export const statusChangeController = async (req, res) => {
 //Pagination
 export const Pagination = async (req, res) => {
 	try {
+		const userId = req.user.id;
+
 		const pgnum = +(req.query.pgnum ?? 0);
 		const pgsize = +(req.query.pgsize ?? 10);
 		const search = req.query.search ? req.query.search.trim() : null;
@@ -233,13 +234,13 @@ export const Pagination = async (req, res) => {
 			: {};
 
 		const whereCondition = {
+			userId: userId,
 			...searchFilter,
 		};
 
 		if (req.query.priority === "true") {
 			whereCondition.prioritized = true;
 		}
-		console.log(req.query.priority);
 
 		const todos = await prisma.todo.findMany({
 			skip: pgnum * pgsize,

@@ -44,11 +44,9 @@ const Prioritized: React.FC<Props> = ({ data, getData }) => {
 				}
 			);
 
-			console.log(res, "Priority successfully updated");
 			getData();
 			toast.success("Priority changed successfully!");
 		} catch (err: any) {
-			console.error(err);
 			toast.error("Failed to change priority.");
 		}
 	};
