@@ -119,48 +119,6 @@ export const getAllTodo = async (req, res) => {
 	}
 };
 
-//Searching Todo
-
-export const searchTodo = async (req, res) => {
-	const query = req.query;
-	console.log(query);
-
-	try {
-		if (!query.title) {
-			return res.status(400).json({
-				success: false,
-				message: "You must provide at least one search criteria title.",
-			});
-		}
-
-		const lowercasedAndTrimmedTitle = query.title ? query.title.trim() : "";
-
-		const todos = await prisma.todo.findMany({
-			where: {
-				title: {
-					startsWith: lowercasedAndTrimmedTitle,
-					mode: "insensitive",
-				},
-			},
-		});
-		if (todos.length === 0) {
-			return res.status(200).json({
-				success: true,
-				message: "No todos found",
-				todos: [],
-			});
-		}
-
-		return res.status(200).json({
-			success: true,
-			message: "Todo fetched successfully",
-			todos,
-		});
-	} catch (err) {
-		return res.status(500).json({ errors: err.message });
-	}
-};
-
 //Sorting Todo By Date
 export const sortTodoByDate = async (req, res) => {
 	try {
@@ -259,11 +217,11 @@ export const Pagination = async (req, res) => {
 	try {
 		const pgnum = +(req.query.pgnum ?? 0);
 		const pgsize = +(req.query.pgsize ?? 10);
-		console.log(pgnum, pgsize);
+		const search = req.query.search ? req.query.search.trim() : null;
+
 		if (pgnum < 0 || pgsize <= 0) {
 			return res.status(400).json({ error: "Invalid query parameters" });
 		}
-		const search = req.query.search ? req.query.search.trim() : null;
 
 		const searchFilter = search
 			? {
@@ -274,10 +232,19 @@ export const Pagination = async (req, res) => {
 			  }
 			: {};
 
+		const whereCondition = {
+			...searchFilter,
+		};
+
+		if (req.query.priority === "true") {
+			whereCondition.prioritized = true;
+		}
+		console.log(req.query.priority);
+
 		const todos = await prisma.todo.findMany({
 			skip: pgnum * pgsize,
 			take: pgsize,
-			where: searchFilter,
+			where: whereCondition,
 		});
 
 		res.status(200).json(todos);

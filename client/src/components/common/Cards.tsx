@@ -9,6 +9,16 @@ import { motion } from "framer-motion";
 import { useToken } from "@/hooks/Token";
 import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input";
+
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+
 const containerVariants = {
 	hidden: { opacity: 1, scale: 0 },
 	visible: {
@@ -37,6 +47,7 @@ const Cards = () => {
 	const [pgnum, setPgnum] = useState(0);
 	const [pgsize, setPgsize] = useState(10);
 	const [searchTerm, setSearchTerm] = useState("");
+	const [sortPriority, setPriority] = useState("");
 
 	const handlePageChange = useCallback(
 		(newPgnum: number) => {
@@ -46,6 +57,9 @@ const Cards = () => {
 	);
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
+	};
+	const handlePrioritySort = () => {
+		setPriority(sortPriority === "asc" ? "desc" : "asc");
 	};
 	const getData = async () => {
 		try {
@@ -64,6 +78,7 @@ const Cards = () => {
 						pgnum,
 						pgsize,
 						search: searchTerm,
+						priority: sortPriority === "asc",
 					},
 				});
 			}
@@ -93,7 +108,7 @@ const Cards = () => {
 		if (token) {
 			getData();
 		}
-	}, [token, searchTerm, pgnum, pgsize]);
+	}, [token, searchTerm, pgnum, pgsize, sortPriority]);
 
 	const formatDueDate = (dateString: string) => {
 		const timeAgoInstance = format(dateString);
@@ -102,15 +117,44 @@ const Cards = () => {
 
 	return (
 		<>
-			{/* Searching */}
-			<div className="flex items-center justify-center h-full mt-10">
-				<Input
-					className="w-full rounded bg-white md:w-64 p-2  border border-gray-300 shadow-sm focus:outline-none focus:border-indigo-500"
-					type="text"
-					value={searchTerm}
-					onChange={handleSearchChange}
-					placeholder="Search..."
-				/>
+			<div className="flex justify-around items-center">
+				{/* Searching */}
+				<div className="flex items-center justify-center h-full mt-10">
+					<Input
+						className="w-full rounded bg-white md:w-64 p-2  border border-gray-300 shadow-sm focus:outline-none focus:border-indigo-500"
+						type="text"
+						value={searchTerm}
+						onChange={handleSearchChange}
+						placeholder="Search..."
+					/>
+				</div>
+				{/* Priority */}
+				<div>
+					{" "}
+					<div>
+						<Dialog>
+							<DialogTrigger className="bg-black text-white p-2 w-24 rounded">
+								Sort
+							</DialogTrigger>
+							<DialogContent className="bg-white">
+								<DialogHeader>
+									<DialogTitle>
+										Do you want to see only prioritized?
+									</DialogTitle>
+									<DialogDescription className="flex justify-around ">
+										<Button
+											variant="outline"
+											onClick={handlePrioritySort}
+											className="bg-black  rounded text-white hover:scale-105 hover:bg-black hover:text-white"
+										>
+											Priority
+										</Button>
+									</DialogDescription>
+								</DialogHeader>
+							</DialogContent>
+						</Dialog>
+					</div>
+				</div>
 			</div>
 
 			{/*Rendering Cards */}
