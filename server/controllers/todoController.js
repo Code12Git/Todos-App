@@ -126,23 +126,23 @@ export const searchTodo = async (req, res) => {
 	console.log(query);
 
 	try {
+		if (!query.title) {
+			return res.status(400).json({
+				success: false,
+				message: "You must provide at least one search criteria title.",
+			});
+		}
+
+		const lowercasedAndTrimmedTitle = query.title ? query.title.trim() : "";
+
 		const todos = await prisma.todo.findMany({
 			where: {
-				OR: [
-					{
-						title: {
-							startsWith: query.title,
-						},
-					},
-					{
-						description: {
-							startsWith: query.description,
-						},
-					},
-				],
+				title: {
+					startsWith: lowercasedAndTrimmedTitle,
+					mode: "insensitive",
+				},
 			},
 		});
-
 		if (todos.length === 0) {
 			return res.status(200).json({
 				success: true,
@@ -157,19 +157,28 @@ export const searchTodo = async (req, res) => {
 			todos,
 		});
 	} catch (err) {
-		return res.status(500).json({ errors: err.messages });
+		return res.status(500).json({ errors: err.message });
 	}
 };
 
-//Sorting Todo
-export const sortTodo = async (req, res) => {
+//Sorting Todo By Date
+export const sortTodoByDate = async (req, res) => {
 	try {
-		const sortOrder = req.query.prioritized === "true" ? "asc" : "desc";
+		const sortOrder = req.query.sortOrder;
+		let orderBy = {};
+
+		if (sortOrder === "asc") {
+			orderBy = {
+				dueDate: "asc",
+			};
+		} else if (sortOrder === "desc") {
+			orderBy = {
+				dueDate: "desc",
+			};
+		}
 
 		const sortedTodo = await prisma.todo.findMany({
-			orderBy: {
-				prioritized: sortOrder,
-			},
+			orderBy: orderBy,
 		});
 
 		return res.status(200).json({
@@ -251,9 +260,24 @@ export const Pagination = async (req, res) => {
 		const pgnum = +(req.query.pgnum ?? 0);
 		const pgsize = +(req.query.pgsize ?? 10);
 		console.log(pgnum, pgsize);
+		if (pgnum < 0 || pgsize <= 0) {
+			return res.status(400).json({ error: "Invalid query parameters" });
+		}
+		const search = req.query.search ? req.query.search.trim() : null;
+
+		const searchFilter = search
+			? {
+					title: {
+						startsWith: search,
+						mode: "insensitive",
+					},
+			  }
+			: {};
+
 		const todos = await prisma.todo.findMany({
 			skip: pgnum * pgsize,
 			take: pgsize,
+			where: searchFilter,
 		});
 
 		res.status(200).json(todos);

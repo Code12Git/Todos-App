@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Card from "./Card";
 import { privateRequest } from "@/utils/axios";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { format } from "timeago.js";
 import { motion } from "framer-motion";
 import { useToken } from "@/hooks/Token";
 import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
 const containerVariants = {
 	hidden: { opacity: 1, scale: 0 },
 	visible: {
@@ -35,11 +36,17 @@ const Cards = () => {
 	const [loading, setLoading] = useState(true);
 	const [pgnum, setPgnum] = useState(0);
 	const [pgsize, setPgsize] = useState(10);
+	const [searchTerm, setSearchTerm] = useState("");
 
-	const handlePageChange = (newPgnum: number) => {
-		setPgnum(newPgnum);
+	const handlePageChange = useCallback(
+		(newPgnum: number) => {
+			setPgnum(newPgnum);
+		},
+		[setPgnum]
+	);
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
 	};
-
 	const getData = async () => {
 		try {
 			let res;
@@ -56,6 +63,7 @@ const Cards = () => {
 					params: {
 						pgnum,
 						pgsize,
+						search: searchTerm,
 					},
 				});
 			}
@@ -67,25 +75,25 @@ const Cards = () => {
 		}
 	};
 
-	const handleNextPage = () => {
+	const handleNextPage = useCallback(() => {
 		if (data.length === 0) {
 			toast.error("No more todos available");
 		} else {
 			handlePageChange(pgnum + 1);
 		}
-	};
+	}, [data, handlePageChange, pgnum]);
 
-	const handlePreviousPage = () => {
-		if (pgnum > 1) {
+	const handlePreviousPage = useCallback(() => {
+		if (pgnum > 0) {
 			handlePageChange(pgnum - 1);
 		}
-	};
+	}, [handlePageChange, pgnum]);
 
 	useEffect(() => {
 		if (token) {
 			getData();
 		}
-	}, [token, pgnum, pgsize]);
+	}, [token, searchTerm, pgnum, pgsize]);
 
 	const formatDueDate = (dateString: string) => {
 		const timeAgoInstance = format(dateString);
@@ -94,6 +102,18 @@ const Cards = () => {
 
 	return (
 		<>
+			{/* Searching */}
+			<div className="flex items-center justify-center h-full mt-10">
+				<Input
+					className="w-full rounded bg-white md:w-64 p-2  border border-gray-300 shadow-sm focus:outline-none focus:border-indigo-500"
+					type="text"
+					value={searchTerm}
+					onChange={handleSearchChange}
+					placeholder="Search..."
+				/>
+			</div>
+
+			{/*Rendering Cards */}
 			<motion.div
 				variants={containerVariants}
 				initial="hidden"
@@ -130,6 +150,8 @@ const Cards = () => {
 					))
 				)}
 			</motion.div>
+
+			{/*Pagination */}
 			<div className="flex justify-between mt-10">
 				<Button
 					onClick={handlePreviousPage}
