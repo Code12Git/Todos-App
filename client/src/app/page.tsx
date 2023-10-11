@@ -10,9 +10,6 @@ export default async function Home() {
 		<>
 			<Header />
 			<main className="bg-gradient-to-r from-pink-400 via-red-200 to-violet-400 p-4">
-				<div className="flex gap-12 justify-around">
-					<Sorting />
-				</div>
 				<Todo />
 				<Cards />
 			</main>
