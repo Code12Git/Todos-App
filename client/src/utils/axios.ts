@@ -24,4 +24,3 @@ export const publicRequest: AxiosInstance = axios.create({
 export const privateRequest: AxiosInstance = axios.create({
     baseURL: BASE_URL,
 });
-
