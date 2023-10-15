@@ -2,7 +2,7 @@
 import axios, { AxiosInstance } from "axios";
 import { useEffect } from "react";
 
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "http://13.233.40.102:8000/api";
 
 interface Token {
     token: string;
