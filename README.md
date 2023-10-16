@@ -2,6 +2,9 @@
 
 TaskMaster is a simple yet powerful to-do list application that allows users to efficiently manage their tasks. It provides a user-friendly interface, robust backend, and essential features to help you stay organized and productive.
 
+![Screenshot from 2023-10-16 12-54-41](https://github.com/Code12Git/Todos-App/assets/108590542/b0e9763c-66c2-45ad-ba37-9cdd229a01c5)
+
+
 ## Table of Contents
 - [Features](#features)
 - [Prerequisites](#prerequisites)
